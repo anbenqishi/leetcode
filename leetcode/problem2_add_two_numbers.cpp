@@ -17,57 +17,44 @@
  */
 class Solution {
 public:
-    int addNode(ListNode **current, int num) {
-        ListNode *node;
-        int left;
-
-        if (num >= 10) {
-            node = new ListNode(num-10);
-            left = 1;
-        } else {
-            node = new ListNode(num);
-            left = 0;
-        }
-        if (*current == NULL) {
-            *current = node;
-        } else {
-            (*current)->next = node;
-            *current = node;
-        }
-        return left;
-    }
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
         ListNode *result;
         ListNode *p, *q, *current;
-        int tmp;
         int left;
+		int tmp;
 
         left = 0;
         current = NULL;
         result = NULL;
-        for (p = l1, q = l2; p && q; p = p->next, q = q->next) {
-            tmp = p->val + q->val + left;
-            left = addNode(&current, tmp);
-            if (result == NULL)
-                result = current;
+		if (l1 && l2) {
+			tmp = l1->val + l2->val;
+			left = tmp - 10 < 0 ? 0 : 1;
+			current = new ListNode(tmp - 10 < 0 ? tmp : (tmp - 10));
+			result = current;
+		}
+        for (p = l1->next, q = l2->next; p && q; p = p->next, q = q->next) {
+			tmp = p->val + q->val + left;
+			left = tmp - 10 < 0 ? 0 : 1;
+            
+			current->next = new ListNode(tmp - 10 < 0 ? tmp : (tmp - 10));
+			current = current->next;
         }
-        if (left == 1 || p || q) {
-            ListNode *remain = p ? p : (q ? q : NULL); /* the longer list wins */
+        if (left || p || q) {
+			/* the longer list wins */
+            ListNode *remain = p ? p : q; 
             /* first, check the remain. */
             if (remain){
-                ListNode *r;
-                for (r = remain; r; r = r->next){
-                    tmp = r->val + left;
-                    left = addNode(&current, tmp);
+                for (; remain; remain = remain->next){
+					tmp = remain->val + left;
+					left = tmp - 10 < 0 ? 0 : 1;
+                    
+					current->next = new ListNode(tmp - 10 < 0 ? tmp : (tmp - 10));
+					current = current->next;
                 }
             }
             /* all done, something left? */
-            if (left == 1) {
-                if (current == NULL) {
-                    current = new ListNode(1);
-                    result = current;
-                } else
-                    current->next = new ListNode(1);
+            if (left) {
+				current->next = new ListNode(1);
             }
         }
         return result;
